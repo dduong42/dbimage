@@ -1,5 +1,4 @@
 from datetime import datetime
-from unittest import TestCase as UnitTestCase
 from unittest import mock
 
 from dbimage.models import DBImage
@@ -11,7 +10,7 @@ from django.utils.http import http_date
 serve_image = ServeImageView.as_view()
 
 
-class TestGetContentType(UnitTestCase):
+class TestDBImage(TestCase):
     def test_jpg(self):
         image = DBImage(path='image.jpg')
         self.assertEqual(image.content_type(), 'image/jpeg')
@@ -24,9 +23,21 @@ class TestGetContentType(UnitTestCase):
         image = DBImage(path='image.JPG')
         self.assertEqual(image.content_type(), 'image/jpeg')
 
+    def test_jpg_plus_noise(self):
+        image = DBImage(path='image.noise.jpg')
+        self.assertEqual(image.content_type(), 'image/jpeg')
+
     def test_jpg_unknown(self):
         image = DBImage(path='image.unknown')
         self.assertEqual(image.content_type(), 'application/octet-stream')
+
+    def test_from_filename_and_content(self):
+        image = DBImage.create_from_filename_and_content(
+            filename='image.jpg',
+            content=b'content',
+        )
+        self.assertEqual(image.etag, '"9a0364b9e99bb480dd25e1f0284c8555"')
+        self.assertEqual(image.path, 'image.9a0364b9e99b.jpg')
 
 
 class TestServeImageView(TestCase):
