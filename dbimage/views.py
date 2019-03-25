@@ -1,9 +1,16 @@
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404
-from django.views.generic import View
 from django.utils.cache import patch_cache_control
-
+from django.views.decorators.http import condition
+from django.views.generic import View
+from datetime import datetime
 from .models import AbstractDBImage, DBImage
+
+
+def get_last_modified(request: HttpRequest, path: str) -> datetime:
+    return DBImage.objects.filter(path=path)\
+        .values_list('modified_on', flat=True)\
+        .first()
 
 
 class ServeImageView(View):
@@ -21,3 +28,8 @@ class ServeImageView(View):
         # https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control#Browser_compatibility
         patch_cache_control(response, public=True, max_age=self.forever, immutable=True)
         return response
+
+    @classmethod
+    def as_view(cls, **initkwargs):
+        return condition(last_modified_func=get_last_modified)(
+            super().as_view(**initkwargs))

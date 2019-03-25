@@ -4,6 +4,7 @@ from django.db import models
 class AbstractDBImage(models.Model):
     path = models.CharField(max_length=255, unique=True)
     content_type = models.CharField(max_length=128)
+    modified_on = models.DateTimeField(auto_now=True)
     content = models.BinaryField()
 
     class Meta:
