@@ -31,13 +31,25 @@ class TestDBImage(TestCase):
         image = DBImage(path='image.unknown')
         self.assertEqual(image.content_type(), 'application/octet-stream')
 
+    def test_jpg_with_dir(self):
+        image = DBImage(path='directory/image.jpg')
+        self.assertEqual(image.content_type(), 'image/jpeg')
+
     def test_from_filename_and_content(self):
-        image = DBImage.create_from_filename_and_content(
-            filename='image.jpg',
+        image = DBImage.create_from_path_and_content(
+            path='image.jpg',
             content=b'content',
         )
         self.assertEqual(image.etag, '"9a0364b9e99bb480dd25e1f0284c8555"')
         self.assertEqual(image.path, 'image.9a0364b9e99b.jpg')
+
+    def test_from_path_and_content_with_dir(self):
+        image = DBImage.create_from_path_and_content(
+            path='directory/image.jpg',
+            content=b'content',
+        )
+        self.assertEqual(image.etag, '"9a0364b9e99bb480dd25e1f0284c8555"')
+        self.assertEqual(image.path, 'directory/image.9a0364b9e99b.jpg')
 
 
 class TestServeImageView(TestCase):

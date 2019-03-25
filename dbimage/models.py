@@ -32,13 +32,13 @@ class AbstractDBImage(models.Model):
         return hashlib.md5(content).hexdigest()
 
     @classmethod
-    def create_from_filename_and_content(cls, filename: str, content: bytes) -> 'AbstractDBImage':
+    def create_from_path_and_content(cls, path: str, content: bytes) -> 'AbstractDBImage':
         hash = cls.get_hash(content)
-        name, ext = os.path.splitext(filename)
-        path = f'{name}.{hash[:12]}{ext}'
+        left, ext = os.path.splitext(path)
+        new_path = f'{left}.{hash[:12]}{ext}'
         etag = f'"{hash}"'
         return cls.objects.create(
-            path=path,
+            path=new_path,
             content=content,
             etag=etag,
         )
