@@ -27,6 +27,7 @@ class ServeImageView(View):
         # For immutable, it's not in the standards
         # https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control#Browser_compatibility
         patch_cache_control(response, public=True, max_age=self.forever, immutable=True)
+        response['ETag'] = image.etag
         return response
 
     @classmethod

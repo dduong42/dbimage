@@ -16,12 +16,14 @@ class TestServeImageView(TestCase):
         self.path = 'path.png'
         self.content = b'binary-content'
         self.content_type = 'image/png'
+        self.etag = 'some etag'
         with mock.patch('django.utils.timezone.now') as mock_now:
             mock_now.return_value = datetime(year=1991, month=11, day=16)
             self.image = DBImage.objects.create(
                 path=self.path,
                 content_type=self.content_type,
                 content=self.content,
+                etag=self.etag,
             )
 
     def test_404(self):
@@ -60,3 +62,7 @@ class TestServeImageView(TestCase):
         response = serve_image(request, self.path)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content, self.content)
+
+    def test_response_returns_etag(self):
+        response = serve_image(request, self.path)
+        self.assertEqual(response['ETag'], self.etag)
