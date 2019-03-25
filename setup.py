@@ -15,4 +15,10 @@ setup(
     install_requires=[
         'django',
     ],
+    python_requires='>=3.6',
+    classifiers=[
+        'Framework :: Django',
+        'License :: OSI Approved :: MIT License',
+        'Programming Language :: Python',
+    ],
 )
